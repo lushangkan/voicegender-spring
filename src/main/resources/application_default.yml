@@ -1,0 +1,23 @@
+server:
+  bind-address: "0.0.0.0"
+  bind-port: 80
+file:
+  upload-path: './tmp/upload'
+  tmp-path: './tmp'
+  upload-max-size: "10MB"
+  clean-interval: 15
+database:
+  mysql:
+    address: '127.0.0.1'
+    port: 3306
+    username: 'voicegender'
+    password: ''
+    database-name: 'voicegender'
+analyze:
+  hour-maximum: 15
+  tf-serving:
+    address: '127.0.0.1'
+    rest-api-port: 5753
+    check-interval: 15
+  xgboost:
+    model-file: './models/xgboost/model.json'

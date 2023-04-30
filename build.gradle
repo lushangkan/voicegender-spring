@@ -1,0 +1,80 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.5'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "io.freefair.aspectj" version "5.1.1"
+}
+
+var projectName = rootProject.name
+group = 'cn.cutemc'
+version = '0.1.0-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+
+    maven { url 'file://mnt/c/Users/11490/.m2/repository' }
+    
+    maven { url 'https://maven.aliyun.com/repository/central' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin'}
+
+    maven { url 'https://jitpack.io' }
+
+
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //MySQL
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'mysql:mysql-connector-java:8.0.32'
+
+    //Redis
+    implementation 'org.apache.commons:commons-pool2:2.11.1'
+
+    //Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    //FFmpeg
+    implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+
+    //R
+    implementation 'com.github.jbytecode:RCaller:4.0.2'
+
+    //Python
+    implementation 'black.ninia:jep:4.1.1'
+
+    //XGBoost
+    implementation 'ml.dmlc:xgboost4j_2.12:1.7.5'
+
+    //Test
+    testImplementation 'com.opencsv:opencsv:5.7.1'
+    testImplementation 'commons-collections:commons-collections:3.2.2'
+    testImplementation 'org.apache.commons:commons-rng-simple:1.5'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
