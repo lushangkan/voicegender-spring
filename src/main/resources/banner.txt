@@ -6,5 +6,5 @@ ${AnsiColor.BRIGHT_CYAN}
     `-'   `---' `--' `---' `----'.`-  /  `----'`--''--' `---'  `----'`--'
                                  `---'
 ${AnsiColor.DEFAULT}${AnsiBackground.DEFAULT}
-                 --- ${AnsiStyle.BOLD}${AnsiColor.BRIGHT_GREEN}Voicegender${AnsiColor.DEFAULT}${AnsiStyle.NORMAL} --- ${AnsiColor.BRIGHT_MAGENTA}@lushangkan${AnsiColor.DEFAULT} ---
+                  --- ${AnsiStyle.BOLD}${AnsiColor.BRIGHT_GREEN}Voicegender${AnsiColor.DEFAULT}${AnsiStyle.NORMAL} --- ${AnsiColor.BRIGHT_MAGENTA}@lushangkan${AnsiColor.DEFAULT} ---
                           ${AnsiStyle.BOLD}Version: ${AnsiStyle.NORMAL}${AnsiColor.BRIGHT_RED}${AnsiStyle.UNDERLINE}${application.version}${AnsiColor.DEFAULT}${AnsiStyle.NORMAL}

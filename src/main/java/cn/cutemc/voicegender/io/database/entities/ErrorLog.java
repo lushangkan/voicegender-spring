@@ -18,6 +18,7 @@ public class ErrorLog {
         this.time = time;
         this.addr = addr;
         this.uuid = uuid;
+        this.path = path;
         this.uploadFileSize = uploadFileSize;
         this.analyzeStatus = analyzeStatus;
         this.exception = exception;

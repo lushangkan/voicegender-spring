@@ -4,23 +4,15 @@ import cn.cutemc.voicegender.analyze.beans.AnalyzeProperty;
 import cn.cutemc.voicegender.analyze.engine.EngineType;
 import cn.cutemc.voicegender.analyze.engine.tensorflow.serving.TfServingService;
 import cn.cutemc.voicegender.analyze.engine.xgboost.XGBoostService;
+import cn.cutemc.voicegender.analyze.script.RScriptService;
 import cn.cutemc.voicegender.analyze.status.AnalyzeStatus;
 import cn.cutemc.voicegender.core.configs.MainConfig;
-import cn.cutemc.voicegender.io.database.entities.AnalyzeLog;
-import cn.cutemc.voicegender.io.database.entities.ErrorLog;
-import cn.cutemc.voicegender.io.database.repositories.AnalyzeRepository;
-import cn.cutemc.voicegender.io.database.repositories.ErrorRepository;
+import cn.cutemc.voicegender.io.database.LogService;
 import cn.cutemc.voicegender.io.storages.StorageService;
-import cn.cutemc.voicegender.utils.AnalyzeUtils;
 import cn.cutemc.voicegender.utils.FileUtils;
-import cn.cutemc.voicegender.utils.TimeUtils;
-import cn.cutemc.voicegender.utils.UUIDUtils;
 import lombok.extern.apachecommons.CommonsLog;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.data.domain.Example;
 import org.springframework.scheduling.annotation.Async;
 
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +26,6 @@ public class AnalyzeImpl implements Analyze {
 
     private AnalyzeProperty property;
 
-    private final AnalyzeRepository analyzeRepository;
-
     private final MainConfig config;
 
     private final TfServingService tfServing;
@@ -45,16 +35,17 @@ public class AnalyzeImpl implements Analyze {
     private final FFmpegService ffmpeg;
 
     private final StorageService storageService;
-    private final ErrorRepository errorRepository;
+    private final LogService logService;
+    private final RScriptService rScriptService;
 
-    public AnalyzeImpl(AnalyzeRepository analyzeRepository, MainConfig config, TfServingService tfServing, XGBoostService xgboost, FFmpegService ffmpeg, StorageService storageService, ErrorRepository errorRepository) {
-        this.analyzeRepository = analyzeRepository;
+    public AnalyzeImpl(MainConfig config, TfServingService tfServing, XGBoostService xgboost, FFmpegService ffmpeg, StorageService storageService, LogService logService, RScriptService rScriptService) {
         this.config = config;
         this.tfServing = tfServing;
         this.xgboost = xgboost;
         this.ffmpeg = ffmpeg;
         this.storageService = storageService;
-        this.errorRepository = errorRepository;
+        this.logService = logService;
+        this.rScriptService = rScriptService;
     }
 
     @Override
@@ -90,6 +81,7 @@ public class AnalyzeImpl implements Analyze {
             ffmpeg.audioPreprocessing(property.uploadFile(), tmpFile);
         } catch (IOException e) {
             update(property.uuid(), property.time(), property.uploadFile(), null, AnalyzeStatus.FAILED, null, null);
+            error(e);
             throw new RuntimeException(e);
         }
 
@@ -111,10 +103,11 @@ public class AnalyzeImpl implements Analyze {
         Map<Features, Double> features;
 
         try {
-            features = AnalyzeUtils.ComputedFeatures(property.tmpFile());
-        } catch (IOException | ScriptException e) {
+            features = rScriptService.computedFeatures(property.tmpFile());
+        } catch (RuntimeException e) {
             update(property.uuid(), property.time(), property.uploadFile(), property.tmpFile(), AnalyzeStatus.FAILED, null, null);
             log.error("Audio feature extraction failed");
+            error(e);
             throw new RuntimeException(e);
         }
 
@@ -135,6 +128,7 @@ public class AnalyzeImpl implements Analyze {
             } catch (Exception e) {
                 update(property.uuid(), property.time(), property.uploadFile(), property.tmpFile(), AnalyzeStatus.FAILED, null, null);
                 log.error("Audio feature prediction failed, Model type: " + model.getId());
+                error(e);
                 throw new RuntimeException(e);
             }
         }
@@ -145,6 +139,7 @@ public class AnalyzeImpl implements Analyze {
         } catch (Exception e) {
             update(property.uuid(), property.time(), property.uploadFile(), property.tmpFile(), AnalyzeStatus.FAILED, null, null);
             log.error("Audio feature prediction failed, Model type: XGBoost");
+            error(e);
             throw new RuntimeException(e);
         }
 
@@ -152,13 +147,20 @@ public class AnalyzeImpl implements Analyze {
         update(property.uuid(), property.time(), property.uploadFile(), property.tmpFile(), AnalyzeStatus.FINISHED, features, result);
     }
 
+    /**
+     * 更新数据库
+     *
+     * @param uuid            uuid
+     * @param time            时间
+     * @param uploadFile      上传文件
+     * @param tmpFile         临时文件
+     * @param analyzeStatus   分析状态
+     * @param analyzeFeatures 分析特征
+     * @param modelResult     模型结果
+     */
     public void update(UUID uuid, Date time, Path uploadFile, Path tmpFile, AnalyzeStatus analyzeStatus, Map<Features, Double> analyzeFeatures, Map<ModelType, Map<Labels, Double>> modelResult) {
         property = new AnalyzeProperty(uuid, time, uploadFile, tmpFile, analyzeStatus, analyzeFeatures, modelResult);
-        Example<AnalyzeLog> example = Example.of(new AnalyzeLog(null, null, UUIDUtils.uuidToString(uuid), null, null, null));
-        analyzeRepository.findOne(example).ifPresent(analyzeLog -> {
-            analyzeLog.setStatus(analyzeStatus.toString());
-            analyzeRepository.save(analyzeLog);
-        });
+        logService.updateAnalyzeStatus(property);
     }
 
     @Override
@@ -166,15 +168,19 @@ public class AnalyzeImpl implements Analyze {
         return property;
     }
 
+    /**
+     * 错误处理
+     * @param exception 异常
+     */
     private void error(Exception exception) {
-        ErrorLog errorLog = new ErrorLog(TimeUtils.formatTime(new Date()), "null", UUIDUtils.uuidToString(property.uuid()), "analyzeing", "", property.analyzeStatus().toString(), exception.getMessage() + "\n" + ExceptionUtils.getRootCauseMessage(exception));
+        long size = 0;
         if (property.uploadFile() != null) {
             try {
-                errorLog.setUploadFileSize(org.apache.commons.io.FileUtils.byteCountToDisplaySize(Files.size(property.uploadFile())));
+                size = Files.size(property.uploadFile());
             } catch (IOException e) {
-                log.error("Get upload file size failed, UUID: " + property.uuid(), e);
+                log.error("Get file size failed");
             }
         }
-        errorRepository.save(errorLog);
+        logService.logError(new Date(), "", property.uuid(), "", size, property.analyzeStatus(), exception);
     }
 }

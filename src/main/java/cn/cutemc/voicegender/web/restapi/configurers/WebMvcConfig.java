@@ -1,6 +1,6 @@
 package cn.cutemc.voicegender.web.restapi.configurers;
 
-import cn.cutemc.voicegender.io.database.repositories.AccessRepository;
+import cn.cutemc.voicegender.io.database.LogService;
 import cn.cutemc.voicegender.web.restapi.interceptors.BlockingHttpMethodInterceptor;
 import cn.cutemc.voicegender.web.restapi.interceptors.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +11,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final AccessRepository accessRepository;
+    private final LogService logService;
 
     @Autowired
-    public WebMvcConfig(AccessRepository accessRepository) {
-        this.accessRepository = accessRepository;
+    public WebMvcConfig(LogService logService) {
+        this.logService = logService;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new BlockingHttpMethodInterceptor())
                 .addPathPatterns("/**");
 
-        registry.addInterceptor(new RequestInterceptor(accessRepository))
+        registry.addInterceptor(new RequestInterceptor(logService))
                 .addPathPatterns("/**");
     }
 }

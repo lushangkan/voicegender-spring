@@ -7,19 +7,14 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileUtils {
 
-    public static String getRScriptFile(String filename) throws IOException {
-        return Files.readString(getRScriptPath(filename));
-    }
 
-    public static Path getRScriptPath(String filename) throws IOException {
+    public static File getRScriptFile(String filename) throws IOException {
         Resource resource = new ClassPathResource("R/scripts/" + filename);
-        File file = resource.getFile();
-        return file.toPath();
+        return resource.getFile();
     }
 
     public static Path getXGBoostModelPath(MainConfig config) throws IOException {
