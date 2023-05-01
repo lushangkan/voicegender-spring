@@ -5,13 +5,17 @@ import cn.cutemc.voicegender.utils.FileUtils;
 import com.github.rcaller.scriptengine.RCallerScriptEngine;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 @Service
 @CommonsLog
@@ -23,7 +27,7 @@ public class RScriptService {
         log.info("Loading R script...");
 
         try {
-            script = Files.readString(FileUtils.getRScriptFile("computed_features.R").toPath(), StandardCharsets.UTF_8);
+            script = FileUtils.getRScriptResource("computed_features.R").getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             log.fatal("Failed to load R script!");
             throw new Error(e);
@@ -54,7 +58,7 @@ public class RScriptService {
     public Map<Features, Double> computedFeatures(Path wavFile) {
         try {
             RCallerScriptEngine engine = getEngine();
-            engine.put("path", wavFile.toAbsolutePath().toString());
+            engine.put("path", wavFile.toAbsolutePath().toString().replaceAll("\\\\", "/"));
 
             engine.eval(script);
 

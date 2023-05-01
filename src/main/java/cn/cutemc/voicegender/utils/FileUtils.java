@@ -12,9 +12,8 @@ import java.nio.file.Path;
 public class FileUtils {
 
 
-    public static File getRScriptFile(String filename) throws IOException {
-        Resource resource = new ClassPathResource("R/scripts/" + filename);
-        return resource.getFile();
+    public static Resource getRScriptResource(String filename) throws IOException {
+        return new ClassPathResource("R/scripts/" + filename);
     }
 
     public static Path getXGBoostModelPath(MainConfig config) throws IOException {
