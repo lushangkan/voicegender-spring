@@ -7,7 +7,7 @@ plugins {
 
 var projectName = rootProject.name
 group = 'cn.cutemc'
-version = '0.1.1'
+version = '0.1.2'
 sourceCompatibility = '17'
 
 configurations {
@@ -65,7 +65,9 @@ dependencies {
     implementation 'black.ninia:jep:4.1.1'
 
     //XGBoost
-    implementation 'ml.dmlc:xgboost4j_2.12:1.7.5'
+    implementation files('libs/xgboost4j/xgboost4j_2.12-1.7.5.jar')
+    implementation files('libs/xgboost4j/xgboost4j_2.12-1.7.5-sources.jar')
+    implementation 'com.esotericsoftware:kryo:5.5.0'
 
     //Test
     testImplementation 'com.opencsv:opencsv:5.7.1'

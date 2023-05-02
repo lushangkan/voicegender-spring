@@ -57,7 +57,7 @@ public class FFmpegService {
                 .addOutput(output.toString())
                 .setFormat("wav")
                 .setAudioSampleRate(FFmpeg.AUDIO_SAMPLE_16000)
-                .setAudioFilter("bandpass=f=140:width_type=h:w=140:n")
+                .setAudioFilter("bandpass=f=140:width_type=h:w=140")
                 .done();
 
         FFmpegJob job = executor.createJob(builder);
