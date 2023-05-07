@@ -5,6 +5,7 @@ import cn.cutemc.voicegender.analyze.beans.AnalyzeProperty;
 import cn.cutemc.voicegender.analyze.status.AnalyzeStatus;
 import cn.cutemc.voicegender.io.caches.AnalyzeCache;
 import cn.cutemc.voicegender.io.database.LogService;
+import cn.cutemc.voicegender.utils.HttpUtils;
 import cn.cutemc.voicegender.utils.UUIDUtils;
 import cn.cutemc.voicegender.web.restapi.controllers.returners.ReturnRecord;
 import cn.cutemc.voicegender.web.restapi.controllers.returners.StatusRecord;
@@ -59,9 +60,9 @@ public class AppExceptionHandler {
             }
         }
 
-        logService.logError(new Date(), request.getRemoteAddr(), uuid, request.getRequestURI(), filesize, analyzeStatus, throwable);
+        logService.logError(new Date(), HttpUtils.getRemoteAddr(request), uuid, request.getRequestURI(), filesize, analyzeStatus, throwable);
 
-        log.error("Exception occurred, Path: " + request.getRequestURI() + ", UUID: " + uuid + ", Addr: " + request.getRemoteAddr(), throwable);
+        log.error("Exception occurred, Path: " + request.getRequestURI() + ", UUID: " + uuid + ", Addr: " + HttpUtils.getRemoteAddr(request), throwable);
 
         return null;
     }

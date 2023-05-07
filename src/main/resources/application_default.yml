@@ -17,6 +17,8 @@ analyze:
   hour-maximum: 15
   tf-serving:
     address: '127.0.0.1'
+    https: false
+    reconnection-times: 10
     rest-api-port: 5753
     check-interval: 15
   xgboost:

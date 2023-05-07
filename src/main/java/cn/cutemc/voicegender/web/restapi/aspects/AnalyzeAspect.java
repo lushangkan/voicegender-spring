@@ -4,6 +4,7 @@ import cn.cutemc.voicegender.core.configs.MainConfig;
 import cn.cutemc.voicegender.io.caches.RequesterCache;
 import cn.cutemc.voicegender.utils.AspectUtils;
 import cn.cutemc.voicegender.web.restapi.beans.Requester;
+import cn.cutemc.voicegender.web.restapi.controllers.AnalyzeRestController;
 import cn.cutemc.voicegender.web.restapi.controllers.returners.ReturnRecord;
 import cn.cutemc.voicegender.web.restapi.controllers.returners.StatusRecord;
 import cn.cutemc.voicegender.web.restapi.status.RequestStatus;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,21 +20,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Component
 @Aspect
 public class AnalyzeAspect {
 
-    private final RequesterCache requesterCache;
-
-    private final MainConfig config;
+    @Autowired
+    private MainConfig config;
 
     @Autowired
-    public AnalyzeAspect(RequesterCache requesterCache, MainConfig config) {
-        this.requesterCache = requesterCache;
-        this.config = config;
-    }
+    private RequesterCache requesterCache;
 
-    @Around(value = "execution(public * cn.cutemc.voicegender.web.restapi.controllers.AnalyzeRestController.analyze(..)))")
+    @Around(value = "execution(public * cn.cutemc.voicegender.web.restapi.controllers.AnalyzeRestController.analyze(..))")
     public Object beforeAnalyze(ProceedingJoinPoint joinPoint) throws Throwable {
 
         HttpServletRequest req = AspectUtils.getParamByName(joinPoint, "req", HttpServletRequest.class);

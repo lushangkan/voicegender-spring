@@ -55,6 +55,12 @@ public class MainConfig {
     @Value("${analyze.tf-serving.check-interval}")
     private int servingCheckInterval;
 
+    @Value("${analyze.tf-serving.https}")
+    private boolean servingHttps;
+
+    @Value("${analyze.tf-serving.reconnection-times}")
+    private int servingReconnectionTimes;
+
     @Value("${analyze.xgboost.model-file}")
     private String xgboostModelFile;
 

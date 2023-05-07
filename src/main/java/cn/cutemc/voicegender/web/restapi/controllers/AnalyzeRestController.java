@@ -10,6 +10,7 @@ import cn.cutemc.voicegender.io.caches.AnalyzeCache;
 import cn.cutemc.voicegender.io.database.entities.AnalyzeLog;
 import cn.cutemc.voicegender.io.database.repositories.AnalyzeRepository;
 import cn.cutemc.voicegender.io.storages.StorageService;
+import cn.cutemc.voicegender.utils.HttpUtils;
 import cn.cutemc.voicegender.utils.TimeUtils;
 import cn.cutemc.voicegender.utils.UUIDUtils;
 import cn.cutemc.voicegender.web.restapi.controllers.returners.ReturnRecord;
@@ -95,11 +96,11 @@ public class AnalyzeRestController {
 
         // 保存到Log
 
-        AnalyzeLog analyzeLog = new AnalyzeLog(TimeUtils.formatTime(new Date()), req.getRemoteAddr(), UUIDUtils.uuidToString(uuid), FileUtils.byteCountToDisplaySize(file.getSize()), properties.analyzeStatus().toString(), req.getHeader("User-Agent"));
+        AnalyzeLog analyzeLog = new AnalyzeLog(TimeUtils.formatTime(new Date()), HttpUtils.getRemoteAddr(req), UUIDUtils.uuidToString(uuid), FileUtils.byteCountToDisplaySize(file.getSize()), properties.analyzeStatus().toString(), req.getHeader("User-Agent"));
 
         repository.save(analyzeLog);
 
-        log.info("Start a new analyze, request from: " + req.getRemoteAddr() + " with uuid: " + uuid + " UA: " + req.getHeader("User-Agent") + " file size: " + file.getSize() / 1024 / 1024 + "MB");
+        log.info("Start a new analyze, request from: " + HttpUtils.getRemoteAddr(req) + " with uuid: " + uuid + " UA: " + req.getHeader("User-Agent") + " file size: " + file.getSize() / 1024 / 1024 + "MB");
 
         RequestStatus status = RequestStatus.SUCCESS;
 
