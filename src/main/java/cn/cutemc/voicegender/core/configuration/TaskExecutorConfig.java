@@ -33,4 +33,9 @@ public class TaskExecutorConfig {
         return Executors.newScheduledThreadPool(1);
     }
 
+    @Bean(name="taskScheduler")
+    public ScheduledExecutorService taskScheduled(){
+        return Executors.newScheduledThreadPool(1);
+    }
+
 }
