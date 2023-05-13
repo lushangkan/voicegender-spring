@@ -8,7 +8,7 @@ public enum ModelType {
 
     CART("Classification and Regression Tree", "CART", EngineType.TENSORFLOW),
     GBT("Generalized Boosted Tree Regression", "GBT", EngineType.TENSORFLOW),
-    RANDOM_FOREST("Random Forest", "RANDOM_FOREST", EngineType.TENSORFLOW),
+    RANDOM_FOREST("Random Forest", "RF", EngineType.TENSORFLOW),
     XGBOOST("eXtreme Gradient Boosting", "XGBOOST", EngineType.XGBOOST);
 
     private final String fullName;
