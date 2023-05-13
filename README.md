@@ -7,7 +7,7 @@ Voicegender的处理后端，基于Spring boot
 
 | 序号 | 简称     | 详细名称                                         | 运行环境               | 说明 |
 |:---|:-------|:---------------------------------------------|:-------------------|:---|
-| 1  | GBT    | 梯度提升回归树(Generalized Boosted Tree Regression) | Tensorflow-Serving |    |
+| 1  | GBT    | 梯度提升回归树(Gradient Boosted Trees) | Tensorflow-Serving |    |
 | 2  | CART   | 分类回归树(Classification and Regression Tree)    | Tensorflow-Serving |    |
 | 3  | RF     | 随机森林(Random Forest)                          | Tensorflow-Serving |    |
 | 4  | XGBOOT | 极端梯度提升树(eXtreme Gradient Boosting)           | Jvm                |    |
